@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import './App.css';
 import { useState } from 'react';
-import { wait } from '@testing-library/user-event/dist/utils';
+import imageToAdd from "./logo.png";
 import { createClient} from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://hutlkszqjimqkjbkchsg.supabase.co/';
@@ -150,11 +150,11 @@ async function getMachAvailability(workOut: string)
 function App() {
   const [isFinished, setIsFinished] = useState(false);
   let userID: number = getUserID();
-  let treadmils: any = getMachAvailability("cardio");
+  let treadmills: any = getMachAvailability("cardio");
   console.log(userID);
   insertNewUser(userID, 135);
   updateColumn("Machine", "isEmpty", "urlLink", "rand/17");
-  let texts: string = "Welcom to The University of Arkansas gym, also known as the UREC. You have indicated that you would like to work on legs today. Currently there are 5 Treadmils open. To access the treadmils walk 50 feet and turn to your left.";
+  let texts: string = "Welcome to The University of Arkansas gym, also known as the UREC. You have indicated that you would like to work on legs today. Currently there are 5 treadmills open. To access the treadmills, walk 50 feet and turn to your left.";
   useEffect(()=>{
     console.log("Hi");
     var msg = new SpeechSynthesisUtterance();
@@ -170,6 +170,7 @@ function App() {
   return (
     <div className="App">
       <div className="App-header">
+       <img src={imageToAdd} alt="Image" className="App-logo"/>
         EZ Repz
       </div>
       <div className="App-body"> 
