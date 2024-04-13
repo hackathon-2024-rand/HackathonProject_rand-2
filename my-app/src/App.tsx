@@ -1,14 +1,20 @@
 import React, {useEffect} from 'react';
 import './App.css';
 import { useState } from 'react';
-import imageToAdd from "./logo.png";
+import { wait } from '@testing-library/user-event/dist/utils';
+import { createClient} from '@supabase/supabase-js';
 
+const supabaseUrl = 'https://hutlkszqjimqkjbkchsg.supabase.co/';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1dGxrc3pxamltcWtqYmtjaHNnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMjk3NTI2NSwiZXhwIjoyMDI4NTUxMjY1fQ.F3Td4ApsS9FCLcvwYDHPI4DTsEtA9iTRQeIbJikBnWw';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+let finish: boolean = false;
 function getUserID() {
   // Key to store/retrieve the user ID
   const USER_ID_KEY = 'userId';
 
   // Try to retrieve the user ID from local storage
-  let userId = localStorage.getItem(USER_ID_KEY);
+  let userId = Number(localStorage.getItem(USER_ID_KEY));
 
   // Check if a user ID was found
   if (!userId) {
@@ -16,7 +22,7 @@ function getUserID() {
       userId = generateUniqueId();
 
       // Store the new user ID in local storage
-      localStorage.setItem(USER_ID_KEY, userId);
+      localStorage.setItem(USER_ID_KEY, String(userId));
   }
 
   // Return the user ID
@@ -25,15 +31,16 @@ function getUserID() {
 
 function generateUniqueId() {
   // Generate a pseudo-random unique identifier
-  return 'uid_' + Math.random().toString(36).substr(2, 9);
+  return Math.floor(Math.random() * 100000000);;
 }
 
 interface ReadAlongProps {
   text: string;           // Specify that `text` should be a string
   baseInterval?: number;
+  onComplete: () => void;
 }
 
-const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000 }) => {
+const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000, onComplete }) => {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
@@ -64,10 +71,11 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000 }) => {
     const timer = setTimeout(handleWordRead, interval);
 
     return () => clearTimeout(timer);
-  }, [currentSentenceIndex, currentWordIndex, words, sentences, baseInterval]);
+  }, [currentSentenceIndex, currentWordIndex, words, sentences, baseInterval, onComplete]);
 
   if (isFinished) {
-    return <p>Finished reading.</p>;
+    onComplete(); 
+    return <p></p>;
   } else {
     return (
       <p>
@@ -79,28 +87,93 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000 }) => {
       </p>
     );
   }
+  return (<p>ERROR</p>);
 };
 
+
+async function updateColumn(tableName: string, columnToUpdate: any, conditionColumn: string, conditionValue: any)
+{
+    const  response1  = await supabase
+       .from(tableName)
+       .select(columnToUpdate)
+       .eq(conditionColumn, conditionValue)
+       .single();
+
+    const result = response1.data ?? []; 
+    const currentValue = result[columnToUpdate]; 
+    const newValue = !currentValue; 
+
+    console.log(currentValue);
+    console.log(newValue);
+
+    await supabase
+        .from(tableName)
+        .update({[columnToUpdate] : newValue})
+        .eq(conditionColumn, conditionValue); 
+}
+async function insertNewUser(usID: number, initialWeight: number)
+{
+        await supabase
+            .from('Users')
+            .insert([{userID: usID, currWeight: initialWeight}]);
+}
+
+
+async function getMachAvailability(workOut: string)
+{
+    const [response1, response2] = await Promise.all([
+    supabase
+        .from('Machine')
+        .select('')
+        .eq('muscleWorked', workOut), 
+    supabase
+        .from('Machine')
+        .select('isEmpty')
+        .eq('muscleWorked', workOut)
+        .eq('isEmpty', 'FALSE')
+    ]);
+
+  const data1 = response1.data ?? [];
+  const data2 = response2.data ?? []; 
+
+    const countTotal= data1.length; 
+    const count = data2.length; 
+
+    return count; 
+    //console.log('Total available machines for ' + workOut + ' is: ', count);
+    //console.log('Total percent availability: ', (count/countTotal)100, '%'); 
+};
+
+
+
+
 function App() {
-  let texts: string = "Welcome to the treadmill! Directly in front of you, you will find the safety clip. Please clip in onto your shirt now for your own safety. To the left of the clip, you will find the start button. To the right of the clip, you will find the stop button. Please find the metal grasps on the handles to your left and right. These will measure your heart rate. In front of the left heart rate sensor are the buttons for increasing and decreasing the incline. In front of the right heart rate sensor are the buttons for increasing and decreasing the speed. Please alert a member of staff if you have any issues. Have a good workout!";
+  const [isFinished, setIsFinished] = useState(false);
+  let userID: number = getUserID();
+  let treadmils: any = getMachAvailability("cardio");
+  console.log(userID);
+  insertNewUser(userID, 135);
+  updateColumn("Machine", "isEmpty", "urlLink", "rand/17");
+  let texts: string = "Welcom to The University of Arkansas gym, also known as the UREC. You have indicated that you would like to work on legs today. Currently there are 5 Treadmils open. To access the treadmils walk 50 feet and turn to your left.";
   useEffect(()=>{
     console.log("Hi");
     var msg = new SpeechSynthesisUtterance();
     var voices = window.speechSynthesis.getVoices();
-    msg.text = "Welcome to the treadmill! Directly in front of you, you will find the safety clip. Please clip in onto your shirt now for your own safety. To the left of the clip, you will find the start button. To the right of the clip, you will find the stop button. Please find the metal grasps on the handles to your left and right. These will measure your heart rate. In front of the left heart rate sensor are the buttons for increasing and decreasing the incline. In front of the right heart rate sensor are the buttons for increasing and decreasing the speed. Please alert a member of staff if you have any issues. Have a good workout!";
+    msg.text = texts;
     msg.voice = voices[1];
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(msg);
   }, [])
-
+  const handleCompletion = () => {
+    setIsFinished(true);  // Update state to show buttons
+  };
   return (
     <div className="App">
       <div className="App-header">
-        <img src={imageToAdd} alt="Image" className="App-logo"/>
         EZ Repz
       </div>
-      <div className="App-body">
-        <ReadAlong text={texts} baseInterval={250}/>
+      <div className="App-body"> 
+        <ReadAlong text={texts} baseInterval={250} onComplete={handleCompletion}/>
       </div>
     </div>
   );
