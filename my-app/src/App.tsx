@@ -72,9 +72,8 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000 }) => {
     return (
       <p>
         {words.map((word, index) => (
-          <span key={index} className={index === currentWordIndex ? 'Active-Text' : 'Static-Text'}
-          style={{ fontWeight: index === currentWordIndex ? 'bold' : 'normal', marginRight: '5px' }}>
-            {word}
+          <span key={index} className={index === currentWordIndex ? 'Active-Text' : 'Static-Text'}>
+            {word + ' '}
           </span>
         ))}
       </p>
@@ -100,7 +99,7 @@ function App() {
         EZ Repz
       </div>
       <div className="App-body">
-        <ReadAlong text={texts} baseInterval={450}/>
+        <ReadAlong text={texts} baseInterval={250}/>
       </div>
     </div>
   );
