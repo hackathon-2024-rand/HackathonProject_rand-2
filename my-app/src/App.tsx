@@ -1,5 +1,7 @@
 import React, {useEffect} from 'react';
 import './App.css';
+import { useState } from 'react';
+import { wait } from '@testing-library/user-event/dist/utils';
 
 function getUserID() {
   // Key to store/retrieve the user ID
@@ -28,43 +30,51 @@ function generateUniqueId() {
 
 interface ReadAlongProps {
   text: string;           // Specify that `text` should be a string
-  interval?: number;      // Specify that `interval` is an optional number
+  baseInterval?: number;
 }
 
-const ReadAlong: React.FC<ReadAlongProps> = ({ text, interval = 1000 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFinished, setIsFinished] = useState(false); // State to control when read-along is finished
-  const words = text.split(/\s+/);  // Split text into words by spaces
+const ReadAlong: React.FC<ReadAlongProps> = ({ text, baseInterval = 1000 }) => {
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+  const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || []; // Split text into sentences
+  const words = sentences[currentSentenceIndex]?.split(/\s+/) || [];
 
   useEffect(() => {
-    if (words.length === 0) {
+    if (sentences.length === 0) {
       setIsFinished(true);
       return;
     }
-    const timer = setInterval(() => {
-      setCurrentIndex(current => {
-        if (current + 1 < words.length) {
-          return current + 1;
-        } else {
-          clearInterval(timer); // Stop the timer when the last word is reached
-          setIsFinished(true);  // Set finished state to true
-          interval += 200;
-          return current;
-        }
-      });
-    }, interval);
 
-    return () => clearInterval(timer);  // Clean up the interval on component unmount
-  }, [words.length, interval]);
+    const handleWordRead = () => {
+      if (currentWordIndex + 1 < words.length) {
+        setCurrentWordIndex(currentWordIndex + 1);
+      } else if (currentSentenceIndex + 1 < sentences.length) {
+        setCurrentSentenceIndex(currentSentenceIndex + 1);
+        setCurrentWordIndex(0);
+      } else {
+        setIsFinished(true);
+      }
+    };
+
+    const currentWord = words[currentWordIndex];
+    const containsPunctuation = /[.,\/#!$%\^&\*;:{}=\-_`~()]/.test(currentWord);
+    const interval = containsPunctuation ? baseInterval + 300 : baseInterval;
+
+    const timer = setTimeout(handleWordRead, interval);
+
+    return () => clearTimeout(timer);
+  }, [currentSentenceIndex, currentWordIndex, words, sentences, baseInterval]);
 
   if (isFinished) {
-    return (<p></p>); // Render empty paragraph when finished
+    return <p>Finished reading.</p>;
   } else {
     return (
       <p>
         {words.map((word, index) => (
-          <span key={index} className={index === currentIndex ? 'Active-Text' : 'Static-Text'}>
-            {word + ' '}
+          <span key={index} className={index === currentWordIndex ? 'Active-Text' : 'Static-Text'}
+          style={{ fontWeight: index === currentWordIndex ? 'bold' : 'normal', marginRight: '5px' }}>
+            {word}
           </span>
         ))}
       </p>
