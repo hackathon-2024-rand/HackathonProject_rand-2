@@ -1,8 +1,6 @@
 import React, {useEffect} from 'react';
-import logo from './logo.svg';
-import treadmil from './images.jpg';
 import './App.css';
-
+/*
 function getUserID() {
   // Key to store/retrieve the user ID
   const USER_ID_KEY = 'userId';
@@ -72,7 +70,7 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, interval = 1000 }) => {
     );
   }
 };
-
+*/
 function App() {
   useEffect(()=>{
     console.log("Hi");
