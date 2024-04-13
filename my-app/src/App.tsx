@@ -9,19 +9,12 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src= {treadmil} alt="logo" />
-        <p className='text-red-500'>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        EZ Repz
       </header>
+      <body className="App-body">
+        This is all of our body information.
+        Doesn't it look so cool?
+      </body>
     </div>
   );
 }

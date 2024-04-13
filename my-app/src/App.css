@@ -14,13 +14,28 @@
 }
 
 .App-header {
-  background-color: white;
-  min-height: 100vh;
+  background-color: #e4e1d8;
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 9vmin;
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-style: italic;
+  color: black;
+}
+
+.App-body {
+  background-color: #f5f2e9;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: black;
 }
 
