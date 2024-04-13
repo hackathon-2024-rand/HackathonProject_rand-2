@@ -7,12 +7,14 @@
   font-weight: bold;
   color: black;
   font-size: 7vmin;
+  flex-direction: column;
 }
 .Static-Text {
   font-style: normal;
   font-weight: normal;
   color: gray;
   font-size: 7vmin;
+  flex-direction: column;
 }
 
 .App-header {
