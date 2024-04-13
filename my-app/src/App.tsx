@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import './App.css';
-/*
+
 function getUserID() {
   // Key to store/retrieve the user ID
   const USER_ID_KEY = 'userId';
@@ -48,6 +48,7 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, interval = 1000 }) => {
         } else {
           clearInterval(timer); // Stop the timer when the last word is reached
           setIsFinished(true);  // Set finished state to true
+          interval += 200;
           return current;
         }
       });
@@ -70,7 +71,7 @@ const ReadAlong: React.FC<ReadAlongProps> = ({ text, interval = 1000 }) => {
     );
   }
 };
-*/
+
 function App() {
   useEffect(()=>{
     console.log("Hi");
